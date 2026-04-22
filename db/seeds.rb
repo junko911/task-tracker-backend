@@ -1,9 +1,10 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+Task.create!([
+  { title: 'Set up project repository', description: 'Initialize Git repo, add .gitignore and README', status: 'completed' },
+  { title: 'Design database schema', description: 'Plan out the tables and relationships needed for the app', status: 'completed' },
+  { title: 'Build GraphQL API', description: 'Implement queries and mutations for task management', status: 'in_progress' },
+  { title: 'Create frontend components', description: 'Build React components for task list, form, and filters', status: 'in_progress' },
+  { title: 'Write unit tests', description: 'Add test coverage for models and GraphQL resolvers', status: 'pending' },
+  { title: 'Deploy to production', description: 'Set up CI/CD pipeline and deploy to hosting provider', status: 'pending' },
+])
+
+puts "Seeded #{Task.count} tasks"
