@@ -1,24 +1,91 @@
-# README
+# Task Tracker API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Rails 7 API-only app with GraphQL. The Vite client lives in `frontend/` next to this folder.
 
-Things you may want to cover:
+## Stack
 
-* Ruby version
+| Layer     | Technology          |
+|-----------|---------------------|
+| Runtime   | Ruby 3.2.2          |
+| Framework | Rails 7.1 (API)     |
+| API       | GraphQL (graphql)   |
+| Database  | PostgreSQL 16     |
 
-* System dependencies
+## Quick start (Docker)
 
-* Configuration
+```bash
+docker compose up --build
+```
 
-* Database creation
+GraphQL: [http://localhost:3001/graphql](http://localhost:3001/graphql)
 
-* Database initialization
+## Local development (without Docker)
 
-* How to run the test suite
+```bash
+bundle install
+rails db:create db:migrate db:seed
+rails server -p 3001
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+Ensure PostgreSQL is running and `config/database.yml` matches your environment.
 
-* Deployment instructions
+## Frontend
 
-* ...
+Run the API on port **3001**. In `frontend/` set either:
+
+- `VITE_GRAPHQL_URL=http://localhost:3001/graphql`, or
+- `VITE_GRAPHQL_URL=/graphql` and `API_PROXY_TARGET=http://127.0.0.1:3001` if you proxy through Vite.
+
+CORS is wide open in dev (`origins '*'`). Lock that down in `config/application.rb` before production.
+
+## GraphQL
+
+Send queries and mutations as `POST /graphql` (JSON body: `query`, `variables`, `operationName`).
+
+### Queries
+
+```graphql
+query {
+  tasks(status: pending) {
+    id title description status createdAt updatedAt
+  }
+}
+
+query {
+  task(id: "1") {
+    id title description status
+  }
+}
+```
+
+### Mutations
+
+```graphql
+mutation {
+  createTask(title: "My task", description: "Details", status: pending) {
+    task { id title status }
+    errors
+  }
+}
+
+mutation {
+  updateTask(id: "1", status: completed) {
+    task { id title status }
+    errors
+  }
+}
+
+mutation {
+  deleteTask(id: "1") {
+    success errors
+  }
+}
+```
+
+## Task status values
+
+| Value         | Meaning              |
+|---------------|----------------------|
+| `pending`     | Not yet started      |
+| `in_progress` | In progress          |
+| `completed`   | Done                 |
