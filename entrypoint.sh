@@ -15,7 +15,7 @@ echo "PostgreSQL is ready"
 # Create the database if it doesn't exist, then migrate
 bundle exec rails db:create db:migrate
 
-# Seed only if the database is empty
-bundle exec rails runner "Task.count == 0 && Rails.application.load_seed" 2>/dev/null || true
+# Idempotent demo data when demo user missing (migration may have created other users)
+bundle exec rails runner "User.find_by(email: 'demo@example.com').nil? && Rails.application.load_seed" 2>/dev/null || true
 
 exec "$@"

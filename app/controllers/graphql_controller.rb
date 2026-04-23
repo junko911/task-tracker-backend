@@ -3,7 +3,9 @@ class GraphqlController < ApplicationController
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    context = {}
+    context = {
+      current_user: current_graphql_user
+    }
 
     result = AppSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
@@ -14,6 +16,20 @@ class GraphqlController < ApplicationController
   end
 
   private
+
+  def current_graphql_user
+    token = bearer_token
+    return if token.blank?
+
+    User.find_by(api_token: token)
+  end
+
+  def bearer_token
+    header = request.authorization.to_s
+    return unless header.match?(/\ABearer /i)
+
+    header.sub(/\ABearer /i, '').strip.presence
+  end
 
   def prepare_variables(variables_param)
     case variables_param

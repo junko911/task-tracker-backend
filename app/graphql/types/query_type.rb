@@ -1,5 +1,7 @@
 module Types
   class QueryType < Types::BaseObject
+    include GraphqlAuthenticatable
+
     field :tasks,
       [Types::TaskType],
       null: false,
@@ -15,15 +17,18 @@ module Types
       end
 
     def tasks(status: nil)
+      user = require_current_user!
+      scope = user.tasks.order(created_at: :desc)
       if status.present?
-        Task.where(status: status).order(created_at: :desc)
+        scope.by_status(status)
       else
-        Task.order(created_at: :desc)
+        scope
       end
     end
 
     def task(id:)
-      Task.find_by(id: id)
+      user = require_current_user!
+      user.tasks.find_by(id: id)
     end
   end
 end

@@ -11,7 +11,8 @@ module Mutations
     field :errors, [String],        null: false
 
     def resolve(id:, title: nil, description: nil, status: nil)
-      task = Task.find_by(id: id)
+      user = require_current_user!
+      task = user.tasks.find_by(id: id)
 
       return { task: nil, errors: ['Task not found'] } unless task
 

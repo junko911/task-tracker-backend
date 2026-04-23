@@ -10,7 +10,8 @@ module Mutations
     field :errors, [String],        null: false
 
     def resolve(title:, description: nil, status: nil)
-      task = Task.new(
+      user = require_current_user!
+      task = user.tasks.build(
         title: title,
         description: description,
         status: status || 'pending'

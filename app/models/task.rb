@@ -1,4 +1,6 @@
 class Task < ApplicationRecord
+  belongs_to :user
+
   enum :status, {
     pending: 'pending',
     in_progress: 'in_progress',
