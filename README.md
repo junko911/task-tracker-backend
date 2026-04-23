@@ -27,7 +27,32 @@ rails db:create db:migrate db:seed
 rails server -p 3001
 ```
 
-Ensure PostgreSQL is running and `config/database.yml` matches your environment.
+Ensure PostgreSQL is running. Defaults in [`config/database.yml`](config/database.yml) use `DB_USERNAME` / `DB_PASSWORD` (default `postgres` / `postgres`, same as Docker). On **macOS Homebrew** Postgres you often have no `postgres` role — use your login user, for example:
+
+```bash
+export DB_USERNAME="$(whoami)"
+export DB_PASSWORD=""
+rails db:create db:migrate db:seed
+rails server -p 3001
+```
+
+## Tests
+
+```bash
+bin/rails db:test:prepare
+bin/rails test
+```
+
+Run one file: `bin/rails test test/integration/graphql_authentication_test.rb`
+
+**Docker** (no local Postgres role tuning):
+
+```bash
+docker compose up -d db
+docker compose run --rm --entrypoint "" api sh -c "bundle install && RAILS_ENV=test bin/rails db:test:prepare test"
+```
+
+`--entrypoint ""` skips the API container entrypoint so `bundle install` can refresh gems against the mounted `Gemfile.lock` before tests.
 
 ## Frontend
 
