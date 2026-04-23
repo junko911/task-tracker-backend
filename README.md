@@ -6,7 +6,7 @@ Rails 7 API-only app with GraphQL. The Vite client lives in `frontend/` next to 
 
 | Layer     | Technology          |
 |-----------|---------------------|
-| Runtime   | Ruby 3.2.2          |
+| Runtime   | Ruby 3.2.2+ (see `Gemfile`) |
 | Framework | Rails 7.1 (API)     |
 | API       | GraphQL (graphql)   |
 | Database  | PostgreSQL 16     |
@@ -42,7 +42,27 @@ CORS is wide open in dev (`origins '*'`). Lock that down in `config/application.
 
 Send queries and mutations as `POST /graphql` (JSON body: `query`, `variables`, `operationName`).
 
+### Authentication
+
+Task queries and task mutations require header:
+
+`Authorization: Bearer <api_token>`
+
+Get a token with `signUp` or `signIn` (no auth header needed). After `db:seed`, demo user is `demo@example.com` / `password12`; seed output prints that user’s `api_token`.
+
+```graphql
+mutation {
+  signIn(email: "demo@example.com", password: "password12") {
+    apiToken
+    errors
+    user { id email }
+  }
+}
+```
+
 ### Queries
+
+Send authenticated queries with the `Authorization` header set to `Bearer <api_token>`.
 
 ```graphql
 query {
@@ -59,6 +79,8 @@ query {
 ```
 
 ### Mutations
+
+`createTask`, `updateTask`, and `deleteTask` require the same `Authorization` header.
 
 ```graphql
 mutation {
