@@ -9,12 +9,21 @@ module Types
         argument :status, Types::TaskStatusEnum, required: false
       end
 
+    field :me,
+      Types::UserType,
+      null: false,
+      description: 'Return the currently authenticated user'
+
     field :task,
       Types::TaskType,
       null: true,
       description: 'Find a task by ID' do
         argument :id, ID, required: true
       end
+
+    def me
+      require_current_user!
+    end
 
     def tasks(status: nil)
       user = require_current_user!

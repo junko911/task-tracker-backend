@@ -233,6 +233,26 @@ class GraphqlAuthenticationTest < ActionDispatch::IntegrationTest
     assert payload['errors'].any? { |e| e.include?('Email') }
   end
 
+  test 'me without bearer returns graphql error' do
+    post '/graphql',
+      params: { query: '{ me { id email } }' },
+      as: :json
+    body = JSON.parse(response.body)
+    assert body['errors'].present?
+    assert_includes body.dig('errors', 0, 'message'), 'Authentication required'
+  end
+
+  test 'me with valid bearer returns current user' do
+    post '/graphql',
+      params: { query: '{ me { id email } }' },
+      headers: { 'Authorization' => "Bearer #{@user.api_token}" },
+      as: :json
+    body = JSON.parse(response.body)
+    assert_nil body['errors']
+    assert_equal @user.id.to_s, body.dig('data', 'me', 'id')
+    assert_equal 'owner@example.com', body.dig('data', 'me', 'email')
+  end
+
   test 'delete_task cannot destroy another users task' do
     other = User.create!(
       email: 'deleter@example.com',
