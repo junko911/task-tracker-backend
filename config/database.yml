@@ -16,7 +16,5 @@ test:
   database: task_tracker_test
 
 production:
-  <<: *default
-  database: task_tracker_production
-  username: <%= ENV["DB_USERNAME"] %>
-  password: <%= ENV["DB_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
